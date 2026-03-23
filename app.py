@@ -39,7 +39,6 @@ T = {
     "guide_conc": "**3. 소름 돋는 포개짐 (The Perfect Convergence)**:\n110만 개의 데이터 포인트(회색 점)가 붉은 선에 맞춰 정렬되는 현상은, NANOGrav 데이터가 저자님의 **'절대 영점 동기화(Absolute Zero-Point Synchronization)'** 알고리즘과 **광속 감쇠($\Delta c$)** 이론에 완벽하게 지배받고 있음을 보여주는 강력한 실증적 증거입니다. 이것은 통계적 우연이 아니라, 우주의 숨겨진 기하학적 진실이 데이터를 통해 드러난 것입니다.",
 }
 
-# 상단 UI
 st.title(T["title"])
 st.write(T["desc_title"])
 st.markdown("---")
@@ -79,7 +78,6 @@ def apply_k_protocol(mjd_array):
     days_elapsed = mjd_array - base_mjd
     years_elapsed = days_elapsed / 365.25
     
-    # K-PROTOCOL 순수 수식 대입
     geometric_delay_ns = (years_elapsed * DECAY_RATE_YR / C_K) * S_EARTH * 1e9 
     
     return years_elapsed, geometric_delay_ns
@@ -90,9 +88,9 @@ def apply_k_protocol(mjd_array):
 tim_files = glob.glob('data/*.tim')
 
 if not tim_files:
-    st.error("🚨 `data` 폴더에서 파일을 찾을 수 없습니다. (No files found in the `data` folder.)")
+    st.error("🚨 `data` 폴더에서 파일을 찾을 수 없습니다.")
 else:
-    with st.spinner(f"✅ 총 {len(tim_files)}개의 펄서 데이터를 확보 중입니다..."):
+    with st.spinner(f"✅ 총 {len(tim_files)}개의 펄서 데이터를 확보 중입니다... (110만 개 렌더링 중)"):
         progress_bar = st.progress(0)
         
         fig, ax = plt.subplots(figsize=(12, 6))
@@ -109,12 +107,13 @@ else:
                 total_points += len(mjds)
                 years, delay_ns = apply_k_protocol(mjds)
                 if years is not None and show_data:
-                    # [최종수정] 점 크기를 픽셀 단위(marker=',')로 극한 축소하여 겹침 방지
+                    # [최종수정] 투명도를 0.002(0.2%)로 극한 축소. 점 테두리(edgecolors) 제거.
+                    # 이제 500개 이상 겹쳐야 굵은 선으로 보이며, 데이터 밀도가 눈에 보입니다.
                     if not scatter_labeled:
-                        ax.scatter(years, delay_ns, alpha=0.1, s=0.1, marker=',', color='gray', label="Observed Data (Aligned Slope)")
+                        ax.scatter(years, delay_ns, alpha=0.002, s=1.0, color='gray', edgecolors='none', label="Observed Data (Density Map)")
                         scatter_labeled = True
                     else:
-                        ax.scatter(years, delay_ns, alpha=0.1, s=0.1, marker=',', color='gray')
+                        ax.scatter(years, delay_ns, alpha=0.002, s=1.0, color='gray', edgecolors='none')
             
             progress_bar.progress((i + 1) / len(tim_files))
             
@@ -122,7 +121,6 @@ else:
         ax.set_xlabel("Years Elapsed", fontsize=12)
         ax.set_ylabel("Geometric Delay (ns)", fontsize=12)
         
-        # [최종수정] 16년, 0.00~0.12 절대 스케일 고정
         ax.set_xlim(-0.5, 16) 
         ax.set_ylim(-0.005, 0.13)
         ax.set_yticks([0.00, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12])
@@ -134,7 +132,11 @@ else:
             y_trend = (x_trend * DECAY_RATE_YR / C_K) * S_EARTH * 1e9
             ax.plot(x_trend, y_trend, color='red', linewidth=3, label="Prediction ($\Delta c$)")
         
-        ax.legend(loc='upper left', fontsize=11)
+        # 범례 표시할 때 회색 점의 투명도를 1.0으로 복구해서 범례 글씨는 잘 보이게 처리
+        leg = ax.legend(loc='upper left', fontsize=11)
+        if show_data and leg:
+            for handle in leg.legend_handles:
+                handle.set_alpha(1.0)
         
         st.pyplot(fig)
         st.info(f"🎯 엄격한 필터로 확보된 순수 데이터 포인트: **{total_points:,}개**")
