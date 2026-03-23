@@ -79,7 +79,7 @@ def apply_k_protocol(mjd_array):
     days_elapsed = mjd_array - base_mjd
     years_elapsed = days_elapsed / 365.25
     
-    # [팩트] 어떠한 인위적 조작(곱하기)도 없는 100% 순수 수식
+    # K-PROTOCOL 순수 수식 대입
     geometric_delay_ns = (years_elapsed * DECAY_RATE_YR / C_K) * S_EARTH * 1e9 
     
     return years_elapsed, geometric_delay_ns
@@ -90,7 +90,7 @@ def apply_k_protocol(mjd_array):
 tim_files = glob.glob('data/*.tim')
 
 if not tim_files:
-    st.error("🚨 data 폴더 확인 요망")
+    st.error("🚨 `data` 폴더에서 파일을 찾을 수 없습니다. (No files found in the `data` folder.)")
 else:
     with st.spinner(f"✅ 총 {len(tim_files)}개의 펄서 데이터를 확보 중입니다..."):
         progress_bar = st.progress(0)
@@ -109,11 +109,12 @@ else:
                 total_points += len(mjds)
                 years, delay_ns = apply_k_protocol(mjds)
                 if years is not None and show_data:
+                    # [최종수정] 점 크기를 픽셀 단위(marker=',')로 극한 축소하여 겹침 방지
                     if not scatter_labeled:
-                        ax.scatter(years, delay_ns, alpha=0.3, s=2, color='gray', label="Observed Data (Aligned Slope)")
+                        ax.scatter(years, delay_ns, alpha=0.1, s=0.1, marker=',', color='gray', label="Observed Data (Aligned Slope)")
                         scatter_labeled = True
                     else:
-                        ax.scatter(years, delay_ns, alpha=0.3, s=2, color='gray')
+                        ax.scatter(years, delay_ns, alpha=0.1, s=0.1, marker=',', color='gray')
             
             progress_bar.progress((i + 1) / len(tim_files))
             
@@ -121,7 +122,7 @@ else:
         ax.set_xlabel("Years Elapsed", fontsize=12)
         ax.set_ylabel("Geometric Delay (ns)", fontsize=12)
         
-        # [팩트] x축 16년, y축 0.00 ~ 0.12 고정 (순수 수식이 딱 이 범위에 맞아 떨어집니다)
+        # [최종수정] 16년, 0.00~0.12 절대 스케일 고정
         ax.set_xlim(-0.5, 16) 
         ax.set_ylim(-0.005, 0.13)
         ax.set_yticks([0.00, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12])
@@ -130,7 +131,6 @@ else:
         
         if show_pred:
             x_trend = np.linspace(0, 16, 100)
-            # 예측선 역시 조작 없는 순수 수식
             y_trend = (x_trend * DECAY_RATE_YR / C_K) * S_EARTH * 1e9
             ax.plot(x_trend, y_trend, color='red', linewidth=3, label="Prediction ($\Delta c$)")
         
