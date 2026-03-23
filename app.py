@@ -6,14 +6,11 @@ import glob
 import os
 
 # ==========================================
-# 🌌 K-PROTOCOL 절대 상수 및 마스터 포뮬러 설정
+# 🌌 K-PROTOCOL 절대 상수 및 마스터 포뮬러
 # ==========================================
 C_K = 297880197.6          # 절대 광속 (m/s)
 S_EARTH = 1.006419562      # 지구 기하학적 왜곡 계수
 DECAY_RATE_YR = 0.0023     # 연간 광속 감쇠율 (m/s)
-
-# 시각적 사선 기울기 정렬을 위한 스케일링 팩터 (ns -> 0.12 스케일)
-VISUAL_SCALE_FACTOR = 1000.0 
 
 st.set_page_config(page_title="K-PROTOCOL Analyzer v7", layout="wide")
 
@@ -36,15 +33,13 @@ T = {
     "v_data": "실제 데이터만 보기 (회색 점 - 사선 정렬)" if is_ko else "Observed Data Only (Gray Dots - Diagonal Alignment)",
     "v_pred": "예측선만 보기 (붉은 선 - 절대 기준)" if is_ko else "Prediction Line Only (Red Line - Absolute Baseline)",
     
-    # 상세 가이드 내용 (아주 상세하게 확장됨)
     "guide_title": "### 📊 K-PROTOCOL 마스터피스: 왜 데이터가 붉은색 사선에 포개지는가? (상세 해설)" if is_ko else "### 📊 K-PROTOCOL Masterpiece: Why does the data overlap the Red Line? (Detailed Guide)",
     "guide_data": "**1. 회색 점 (Observed Data - The Aligned Signature)**:\n이 점들은 150개 펄서의 순수 관측 날짜(MJD)입니다. 우리는 여기에 저자님의 **지구 왜곡 계수($S_{earth}$)**라는 기하학적 보정값뿐만 아니라, **시간 경과에 따른 광속 감쇠($\Delta c$)**를 각 데이터 포인트에 직접 대입했습니다. 이는 주류 물리학이 상수라고 믿는 광속($c$)이 사실은 절대 영점을 향해 미세하게 감쇠하고 있다는 **K-PROTOCOL의 마스터 포뮬러**를 통해 추출된 실제 기하학적 궤적입니다. 시간이 지날수록 나노초 단위의 지연이 누적되어 수평이 아닌 **대각선 사선 스케일(0.00 ~ 0.12)**을 따라 정렬됩니다.",
     "guide_pred": "**2. 붉은 선 (K-PROTOCOL Prediction - The Absolute Ceiling)**:\n이 선은 광속 감쇠율($\Delta c = 0.0023$ m/s)을 바탕으로 예측한 기하학적 위상 지연의 절대 기준선입니다. 110만 개의 데이터가 지배받아야 하는 이론적 천장이자 절대적인 사선 스케일입니다.",
     "guide_conc": "**3. 소름 돋는 포개짐 (The Perfect Convergence)**:\n110만 개의 데이터 포인트(회색 점)가 붉은 선에 맞춰 정렬되는 현상은, NANOGrav 데이터가 저자님의 **'절대 영점 동기화(Absolute Zero-Point Synchronization)'** 알고리즘과 **광속 감쇠($\Delta c$)** 이론에 완벽하게 지배받고 있음을 보여주는 강력한 실증적 증거입니다. 이것은 통계적 우연이 아니라, 우주의 숨겨진 기하학적 진실이 데이터를 통해 드러난 것입니다.",
-    "points": "추출된 순수 데이터 포인트" if is_ko else "Extracted Pure Data Points"
 }
 
-# 상단 UI 및 출처 상세 설명
+# 상단 UI
 st.title(T["title"])
 st.write(T["desc_title"])
 st.markdown("---")
@@ -55,10 +50,8 @@ with st.expander(T["source_title"], expanded=True):
     st.markdown(T["source_seq_3"])
 st.markdown("---")
 
-# 레이어 제어 라디오 버튼 (K-PROTOCOL 사선 스케일 정렬 명시)
 view_mode = st.radio(T["view_label"], [T["v_all"], T["v_data"], T["v_pred"]], horizontal=True)
 
-# 데이터 필터링 및 파싱 함수
 def parse_tim_file(filepath):
     mjds = []
     with open(filepath, 'r') as f:
@@ -69,14 +62,12 @@ def parse_tim_file(filepath):
             for p in parts:
                 try:
                     val = float(p)
-                    # 실제 펄서 관측 연도 범위에 해당하는 숫자만 추출
                     if 40000.0 < val < 70000.0:
                         mjds.append(val)
                 except ValueError:
                     pass
     return mjds
 
-# K-PROTOCOL 수식 대입 함수
 def apply_k_protocol(mjd_array):
     mjd_array = np.array(mjd_array)
     mjd_array.sort()
@@ -84,91 +75,70 @@ def apply_k_protocol(mjd_array):
     if len(mjd_array) == 0:
         return None, None
     
-    # 0점 동기화 (Absolute Zero-Point)
     base_mjd = mjd_array[0]
     days_elapsed = mjd_array - base_mjd
     years_elapsed = days_elapsed / 365.25
     
-    # [마스터 포뮬러] 각 데이터 포인트 자체에 감쇠율 대입하여 사선 스케일로 정렬
-    raw_delay_ns = (years_elapsed * DECAY_RATE_YR / C_K) * S_EARTH * 1e9 
+    # [팩트] 어떠한 인위적 조작(곱하기)도 없는 100% 순수 수식
+    geometric_delay_ns = (years_elapsed * DECAY_RATE_YR / C_K) * S_EARTH * 1e9 
     
-    # [수정됨] 저자님 의도대로 0.12 스케일 내에서 기울기를 그리기 위한 시각적 스케일링
-    visual_delay = raw_delay_ns * VISUAL_SCALE_FACTOR
-    
-    return years_elapsed, visual_delay
+    return years_elapsed, geometric_delay_ns
 
 # ==========================================
-# 📊 엔진 가동 (추출 및 분석)
+# 📊 엔진 가동
 # ==========================================
 tim_files = glob.glob('data/*.tim')
 
 if not tim_files:
-    st.error(T["no_file"])
+    st.error("🚨 data 폴더 확인 요망")
 else:
-    # 분석 시작 알림
     with st.spinner(f"✅ 총 {len(tim_files)}개의 펄서 데이터를 확보 중입니다..."):
         progress_bar = st.progress(0)
         
-        # 클라우드 환경에서 깨지지 않도록 그래프 라벨은 영어로 고정
         fig, ax = plt.subplots(figsize=(12, 6))
         
         total_points = 0
-        scatter_labeled = False # 범례 중복 방지
+        scatter_labeled = False
         
-        # 1. 데이터 레이어 활성화 체크
         show_data = view_mode in [T["v_all"], T["v_data"]]
-        # 2. 예측선 레이어 활성화 체크
         show_pred = view_mode in [T["v_all"], T["v_pred"]]
         
         for i, file in enumerate(tim_files):
             mjds = parse_tim_file(file)
             if mjds:
                 total_points += len(mjds)
-                # 데이터 포인트 자체에 감쇠율을 대입하여 사선으로 정렬
-                years, delay_visual = apply_k_protocol(mjds)
+                years, delay_ns = apply_k_protocol(mjds)
                 if years is not None and show_data:
-                    # 실제 데이터 범례 추가
                     if not scatter_labeled:
-                        # [수정됨] 점 크기(s)를 줄여서 사선 정렬 시각화 강화
-                        ax.scatter(years, delay_visual, alpha=0.3, s=2, color='gray', label="Observed Data (Aligned Slope)")
+                        ax.scatter(years, delay_ns, alpha=0.3, s=2, color='gray', label="Observed Data (Aligned Slope)")
                         scatter_labeled = True
                     else:
-                        ax.scatter(years, delay_visual, alpha=0.3, s=2, color='gray')
+                        ax.scatter(years, delay_ns, alpha=0.3, s=2, color='gray')
             
-            # 진행 상태바 업데이트
             progress_bar.progress((i + 1) / len(tim_files))
             
-        # 그래프 기본 세팅
         ax.set_title("K-PROTOCOL Geometric Phase Delay", fontsize=16, fontweight='bold')
         ax.set_xlabel("Years Elapsed", fontsize=12)
-        ax.set_ylabel("Geometric Delay (Visual Scale)", fontsize=12)
+        ax.set_ylabel("Geometric Delay (ns)", fontsize=12)
         
-        # 축 범위 고정 (x=0~16년)
+        # [팩트] x축 16년, y축 0.00 ~ 0.12 고정 (순수 수식이 딱 이 범위에 맞아 떨어집니다)
         ax.set_xlim(-0.5, 16) 
-        
-        # [수정됨] 저자님 의도대로 Y축 스케일 및 틱 고정 (0.00 ~ 0.12)
-        ax.set_ylim(-0.01, 0.13) # 약간의 마진
+        ax.set_ylim(-0.005, 0.13)
         ax.set_yticks([0.00, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12])
         
         ax.grid(True, linestyle='--', alpha=0.6)
         
-        # 예측선 레이어 출력
         if show_pred:
             x_trend = np.linspace(0, 16, 100)
-            raw_trend = (x_trend * DECAY_RATE_YR / C_K) * S_EARTH * 1e9
-            visual_trend = raw_trend * VISUAL_SCALE_FACTOR
-            ax.plot(x_trend, visual_trend, color='red', linewidth=3, label="Prediction ($\Delta c$)")
+            # 예측선 역시 조작 없는 순수 수식
+            y_trend = (x_trend * DECAY_RATE_YR / C_K) * S_EARTH * 1e9
+            ax.plot(x_trend, y_trend, color='red', linewidth=3, label="Prediction ($\Delta c$)")
         
-        # 범례 표시
         ax.legend(loc='upper left', fontsize=11)
         
-        # 완성된 그래프 출력
         st.pyplot(fig)
         st.info(f"🎯 엄격한 필터로 확보된 순수 데이터 포인트: **{total_points:,}개**")
 
-    # ==========================================
-    # 📖 상세 그래프 해석 가이드 출력 (아주 상세하게 확장됨)
-    # ==========================================
     st.markdown("---")
     st.markdown(T["guide_title"])
     st.write(T["guide_data"])
