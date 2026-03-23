@@ -24,10 +24,10 @@ T = {
     "title": "🌌 K-PROTOCOL: Universal Geometric Calibration" if is_ko else "🌌 K-PROTOCOL: Universal Geometric Calibration",
     "desc_title": "주류 학계의 데이터를 추출하여 절대 광속 감쇠($\Delta c$)를 실증합니다." if is_ko else "Demonstrating the absolute speed of light decay ($\Delta c$) using mainstream academic data.",
     "source_title": "📖 데이터 출처 (Data Source)",
-    "source_seq_title": "#### ⚠️ 데이터 접근 경로 순서 (반드시 확인)",
-    "source_seq_1": "1. [NANOGrav 공식 데이터 포털](https://data.nanograv.org/) 접속",
-    "source_seq_2": "2. 페이지 중앙의 **The NANOGrav 15-Year Data Set** 링크 클릭",
-    "source_seq_3": "3. 최종 제노도(Zenodo) 데이터 저장소로 이동 ([정확한 제노도 링크](https://zenodo.org/records/16051178))",
+    "source_seq_title": "#### ⚠️ 데이터 접근 경로 순서 (반드시 확인)" if is_ko else "#### ⚠️ Data Access Path Sequence (Please Check)",
+    "source_seq_1": "1. [NANOGrav 공식 데이터 포털](https://data.nanograv.org/) 접속" if is_ko else "1. Access the [NANOGrav Official Data Portal](https://data.nanograv.org/)",
+    "source_seq_2": "2. 페이지 중앙의 **The NANOGrav 15-Year Data Set** 링크 클릭" if is_ko else "2. Click the **The NANOGrav 15-Year Data Set** link in the middle of the page",
+    "source_seq_3": "3. 최종 제노도(Zenodo) 데이터 저장소로 이동 ([정확한 제노도 링크](https://zenodo.org/records/16051178))" if is_ko else "3. Move to the final Zenodo data repository ([Exact Zenodo Link](https://zenodo.org/records/16051178))",
     "view_label": "👁️ 그래프 레이어 보기 옵션" if is_ko else "👁️ Graph Layer Options",
     "v_all": "전체 보기 (데이터 + 예측선 포개짐)" if is_ko else "View All (Data + Prediction Overlap)",
     "v_data": "실제 데이터만 보기 (회색 점)" if is_ko else "Observed Data Only (Gray Dots)",
@@ -36,9 +36,16 @@ T = {
     "no_selection": "🚨 펄서를 최소 1개 이상 선택해 주세요." if is_ko else "🚨 Please select at least one pulsar.",
     
     "guide_title": "### 📊 K-PROTOCOL 마스터피스 해설" if is_ko else "### 📊 K-PROTOCOL Masterpiece Guide",
-    "guide_data": "**1. 회색 점 (Observed Data)**: 선택된 펄서의 순수 관측 날짜(MJD)에 K-PROTOCOL의 광속 감쇠($\Delta c$)와 지구 왜곡 계수($S_{earth}$)를 대입하여 추출된 실제 기하학적 궤적입니다. 시간이 지날수록 대각선 사선 스케일(0.00 ~ 0.12)을 따라 정렬됩니다.",
-    "guide_pred": "**2. 붉은 선 (K-PROTOCOL Prediction)**: 광속 감쇠율($\Delta c = 0.0023$ m/s)을 바탕으로 예측한 기하학적 위상 지연의 절대 기준선입니다.",
-    "guide_conc": "**3. 소름 돋는 포개짐**: 파편화된 우주의 점들이 붉은 선에 맞춰 정렬되는 현상은, NANOGrav 데이터가 저자님의 '절대 영점 동기화' 및 '광속 감쇠' 이론에 완벽하게 지배받고 있음을 증명합니다.",
+    "guide_data": "**1. 회색 점 (Observed Data)**: 선택된 펄서의 순수 관측 날짜(MJD)에 K-PROTOCOL의 광속 감쇠($\Delta c$)와 지구 왜곡 계수($S_{earth}$)를 대입하여 추출된 실제 기하학적 궤적입니다. 시간이 지날수록 대각선 사선 스케일(0.00 ~ 0.12)을 따라 정렬됩니다." if is_ko else "**1. Gray Dots (Observed Data)**: This is the actual geometric trajectory extracted by substituting K-PROTOCOL's speed of light decay ($\Delta c$) and Earth distortion coefficient ($S_{earth}$) into the pure observation dates (MJD) of the selected pulsars. Over time, it aligns along the diagonal scale (0.00 to 0.12).",
+    "guide_pred": "**2. 붉은 선 (K-PROTOCOL Prediction)**: 광속 감쇠율($\Delta c = 0.0023$ m/s)을 바탕으로 예측한 기하학적 위상 지연의 절대 기준선입니다." if is_ko else "**2. Red Line (K-PROTOCOL Prediction)**: The absolute baseline of geometric phase delay predicted based on the decay rate of the speed of light ($\Delta c = 0.0023$ m/s).",
+    "guide_conc": "**3. 소름 돋는 포개짐**: 파편화된 우주의 점들이 붉은 선에 맞춰 정렬되는 현상은, NANOGrav 데이터가 저자님의 '절대 영점 동기화' 및 '광속 감쇠' 이론에 완벽하게 지배받고 있음을 증명합니다." if is_ko else "**3. Perfect Convergence**: The phenomenon of fragmented cosmic points aligning with the red line proves that NANOGrav data is perfectly governed by the author's theory of 'Absolute Zero-Point Synchronization' and 'Speed of Light Decay'.",
+
+    # [수정됨] 하드코딩 되어있던 시스템 메시지들을 다국어 사전으로 편입
+    "no_file": "🚨 `data` 폴더에서 파일을 찾을 수 없습니다." if is_ko else "🚨 No files found in the `data` folder.",
+    "spinner_prefix": "✅ 선택된 " if is_ko else "✅ Analyzing ",
+    "spinner_suffix": "개의 펄서 데이터를 분석 중입니다..." if is_ko else " selected pulsar data files...",
+    "info_prefix": "🎯 선택된 펄서의 총 데이터 포인트: **" if is_ko else "🎯 Total data points for selected pulsars: **",
+    "info_suffix": "개**" if is_ko else "**"
 }
 
 st.title(T["title"])
@@ -59,13 +66,13 @@ st.markdown("---")
 tim_files = glob.glob('data/*.tim')
 
 if not tim_files:
-    st.error("🚨 `data` 폴더에서 파일을 찾을 수 없습니다.")
+    st.error(T["no_file"])
 else:
     # 펄서 이름만 추출해서 목록 만들기 (예: J1713+0747)
     pulsar_names = [os.path.basename(f).split('.')[0] for f in tim_files]
     pulsar_names.sort()
     
-    # [새로운 기능] 펄서 다중 선택 드롭다운 (기본값으로 처음 3개만 선택해 둠)
+    # 펄서 다중 선택 드롭다운
     selected_pulsars = st.multiselect(
         T["pulsar_select"],
         options=pulsar_names,
@@ -107,7 +114,8 @@ else:
     if not selected_pulsars:
         st.warning(T["no_selection"])
     else:
-        with st.spinner(f"✅ 선택된 {len(selected_pulsars)}개의 펄서 데이터를 분석 중입니다..."):
+        # [수정됨] 스피너 메시지도 언어에 맞게 출력
+        with st.spinner(f"{T['spinner_prefix']}{len(selected_pulsars)}{T['spinner_suffix']}"):
             
             fig, ax = plt.subplots(figsize=(12, 6))
             total_points = 0
@@ -116,15 +124,12 @@ else:
             show_data = view_mode in [T["v_all"], T["v_data"]]
             show_pred = view_mode in [T["v_all"], T["v_pred"]]
             
-            # 선택된 펄서 개수에 따라 점의 크기와 투명도를 유동적으로 조절
-            # 1~2개일 때는 점이 잘 보이게 크고 진하게, 150개일 때는 작고 연하게
             dynamic_alpha = max(0.05, 1.0 / (len(selected_pulsars) + 1))
             dynamic_s = 10.0 if len(selected_pulsars) < 10 else 2.0
 
             for file in tim_files:
                 p_name = os.path.basename(file).split('.')[0]
                 
-                # 사용자가 선택한 펄서만 사냥
                 if p_name in selected_pulsars:
                     mjds = parse_tim_file(file)
                     if mjds:
@@ -158,7 +163,8 @@ else:
                     handle.set_alpha(1.0)
             
             st.pyplot(fig)
-            st.info(f"🎯 선택된 펄서의 총 데이터 포인트: **{total_points:,}개**")
+            # [수정됨] 데이터 포인트 결과 메시지도 언어에 맞게 출력
+            st.info(f"{T['info_prefix']}{total_points:,}{T['info_suffix']}")
 
     st.markdown("---")
     st.markdown(T["guide_title"])
